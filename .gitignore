@@ -1,0 +1,39 @@
+# Dependencies
+node_modules/
+.npm
+.eslintcache
+
+# Environment
+.env
+.env.local
+.env.production
+
+# Build
+dist/
+build/
+.next/
+out/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Databases & Logs
+*.log
+*.sqlite
+dev.db
+# prisma/migrations/
+
+# Project Specific
+uploads/
+/apps/ai/venv/
+/apps/ai/models/
+**/__pycache__/
+**/*.py[cod]
+*.pt

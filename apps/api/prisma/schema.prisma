@@ -1,0 +1,137 @@
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [vector]
+}
+
+model User {
+  id           Int       @id @default(autoincrement())
+  email        String    @unique
+  passwordHash String    @map("password_hash")
+  name         String
+  phone        String?
+  role         String    @default("user")
+  avatar       String?
+  createdAt    DateTime  @default(now()) @map("created_at")
+  updatedAt    DateTime  @updatedAt @map("updated_at")
+
+  tools          Tool[]
+  rentalsLent    Rental[]     @relation("Lender")
+  rentalsBorrowed Rental[]    @relation("Borrower")
+  aiCorrections  AiCorrection[]
+
+  @@map("users")
+}
+
+model Tool {
+  id            Int       @id @default(autoincrement())
+  ownerId       Int       @map("owner_id")
+  owner         User      @relation(fields: [ownerId], references: [id])
+
+  name          String
+  category      String?
+  type          String?
+  brand         String?
+  model         String?
+  serialNumber  String?   @map("serial_number")
+
+  purchasePrice Int?      @map("purchase_price")
+  purchaseDate  DateTime? @map("purchase_date")
+  purchaseStore String?   @map("purchase_store")
+
+  status        String    @default("available")
+  condition     String    @default("excellent")
+  location      String?
+
+  aiConfidence  Float?    @map("ai_confidence")
+  aiProvider    String?   @map("ai_provider")
+  aiRawResult   Json?     @map("ai_raw_result")
+
+  images        Json?
+  thumbnail     String?
+  
+  embedding     Unsupported("vector(512)")?
+
+  notes         String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  rentals       Rental[]
+  aiEvents      AiEvent[]
+
+  @@index([ownerId])
+  @@index([status])
+  @@map("tools")
+}
+
+model Rental {
+  id          Int       @id @default(autoincrement())
+  toolId      Int       @map("tool_id")
+  tool        Tool      @relation(fields: [toolId], references: [id])
+  lenderId    Int       @map("lender_id")
+  lender      User      @relation("Lender", fields: [lenderId], references: [id])
+  borrowerId  Int       @map("borrower_id")
+  borrower    User      @relation("Borrower", fields: [borrowerId], references: [id])
+
+  startDate   DateTime  @default(now()) @map("start_date")
+  dueDate     DateTime? @map("due_date")
+  returnedAt  DateTime? @map("returned_at")
+  notes       String?
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  @@index([toolId])
+  @@index([returnedAt])
+  @@map("rentals")
+}
+
+model AiEvent {
+  id            Int       @id @default(autoincrement())
+
+  imageUrl      String    @map("image_url")
+  imageHash     String?   @unique @map("image_hash")
+
+  aiPrediction  Json      @map("ai_prediction")
+  aiConfidence  Float     @map("ai_confidence")
+  aiProvider    String    @default("gemini") @map("ai_provider")
+  yoloResult    Json?     @map("yolo_result")
+
+  groundTruth   Json?     @map("ground_truth")
+  correctedBy   Int?      @map("corrected_by")
+  isCorrect     Boolean?  @map("is_correct")
+
+  toolId        Int?      @map("tool_id")
+  tool          Tool?     @relation(fields: [toolId], references: [id])
+  feedback      String?
+
+  corrections   AiCorrection[]
+
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  @@index([aiProvider])
+  @@index([createdAt])
+  @@map("ai_events")
+}
+
+model AiCorrection {
+  id            Int       @id @default(autoincrement())
+  
+  aiEventId     Int       @map("ai_event_id")
+  aiEvent       AiEvent   @relation(fields: [aiEventId], references: [id])
+  
+  userId        Int       @map("user_id")
+  user          User      @relation(fields: [userId], references: [id])
+  
+  originalField  String    @map("original_field")
+  originalValue  String?   @map("original_value")
+  correctedValue String    @map("corrected_value")
+  
+  reason         String?
+  createdAt      DateTime  @default(now()) @map("created_at")
+
+  @@map("ai_corrections")
+}

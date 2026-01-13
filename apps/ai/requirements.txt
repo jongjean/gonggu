@@ -1,0 +1,12 @@
+fastapi
+uvicorn
+pydantic
+python-dotenv
+ultralytics>=8.0.0
+transformers
+torch
+torchvision
+pillow
+google-generativeai
+requests
+numpy

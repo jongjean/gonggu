@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>공구반장 - 스마트 공구 관리</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        dark: {
+                            900: '#0A0A0B',
+                            800: '#1A1A1F',
+                            700: '#2A2A2F',
+                        },
+                        accent: {
+                            red: '#EF4444',
+                            'red-dark': '#DC2626',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: #0A0A0B;
+            color: #FFFFFF;
+        }
+
+        .gradient-red {
+            background: linear-gradient(135deg, #DC2626 0%, #EF4444 100%);
+        }
+
+        .card-dark {
+            background: #1A1A1F;
+            border: 1px solid #2A2A2F;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #1A1A1F 0%, #2A2A2F 100%);
+        }
+    </style>
+</head>
+
+<body class="min-h-screen">
+    <!-- 헤더 -->
+    <header class="border-b border-dark-700">
+        <div class="max-w-7xl mx-auto px-4 py-4 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <span class="text-2xl">🛠️</span>
+                <h1 class="text-xl font-bold">공구반장</h1>
+            </div>
+            <nav class="flex gap-2">
+                <button onclick="showTab('dashboard')" id="btn-dashboard"
+                    class="px-4 py-2 rounded-lg bg-dark-800 hover:bg-dark-700 transition">
+                    📊 홈
+                </button>
+                <button onclick="showTab('tools')" id="btn-tools"
+                    class="px-4 py-2 rounded-lg bg-dark-800 hover:bg-dark-700 transition">
+                    📦 목록
+                </button>
+                <button onclick="showTab('settings')" id="btn-settings"
+                    class="px-4 py-2 rounded-lg bg-dark-800 hover:bg-dark-700 transition">
+                    ⚙️ 설정
+                </button>
+            </nav>
+        </div>
+    </header>
+
+    <!-- 메인 컨텐츠 -->
+    <main class="max-w-7xl mx-auto px-4 py-8">
+        <!-- 대시보드 탭 -->
+        <div id="tab-dashboard" class="tab-content">
+            <!-- 히어로 섹션 -->
+            <section class="text-center py-16">
+                <h2 class="text-5xl font-bold mb-4">
+                    MAXIMIZE YOUR<br>
+                    <span class="text-accent-red">TOOL MANAGEMENT</span>
+                </h2>
+                <p class="text-gray-400 text-lg mb-8">
+                    촬영만으로 AI분석과 자동인식<br>
+                    대여반납 공구현황, 망실기록관리, 100%무료
+                </p>
+                <button onclick="showCamera()"
+                    class="gradient-red px-8 py-4 rounded-xl text-lg font-bold hover:scale-105 transition shadow-lg">
+                    ⚡ 공구 등록하기
+                </button>
+            </section>
+
+            <!-- 통계 카드 -->
+            <section class="mb-12">
+                <h3 class="text-2xl font-bold mb-6">공구현황</h3>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+                    <div class="stat-card rounded-xl p-6 text-center">
+                        <div class="text-sm text-gray-400 mb-2">총 보유</div>
+                        <div class="text-4xl font-bold" id="stat-total">0</div>
+                    </div>
+                    <div class="stat-card rounded-xl p-6 text-center">
+                        <div class="text-sm text-gray-400 mb-2">대여 현황</div>
+                        <div class="text-4xl font-bold text-yellow-400" id="stat-rented">0</div>
+                    </div>
+                    <div class="stat-card rounded-xl p-6 text-center">
+                        <div class="text-sm text-gray-400 mb-2">대여 가능</div>
+                        <div class="text-4xl font-bold text-green-400" id="stat-available">0</div>
+                    </div>
+                    <div class="stat-card rounded-xl p-6 text-center">
+                        <div class="text-sm text-gray-400 mb-2">망실</div>
+                        <div class="text-4xl font-bold text-red-400" id="stat-lost">0</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 기능 타일 -->
+            <section>
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <button onclick="showCamera()"
+                        class="card-dark rounded-xl p-6 hover:scale-105 transition text-center">
+                        <div class="text-4xl mb-3">📷</div>
+                        <div class="font-bold mb-1">촬영 등록</div>
+                        <div class="text-sm text-gray-400">AI이미지분석</div>
+                    </button>
+                    <button onclick="showTab('tools')"
+                        class="card-dark rounded-xl p-6 hover:scale-105 transition text-center">
+                        <div class="text-4xl mb-3">📦</div>
+                        <div class="font-bold mb-1">공구 사용</div>
+                        <div class="text-sm text-gray-400">사용 기능한 공구만</div>
+                    </button>
+                    <button class="card-dark rounded-xl p-6 hover:scale-105 transition text-center">
+                        <div class="text-4xl mb-3">🚨</div>
+                        <div class="font-bold mb-1">망실 현황</div>
+                        <div class="text-sm text-gray-400">파손분실고장 현황</div>
+                    </button>
+                    <button onclick="showTab('tools')"
+                        class="card-dark rounded-xl p-6 hover:scale-105 transition text-center">
+                        <div class="text-4xl mb-3">📂</div>
+                        <div class="font-bold mb-1">공구 목록</div>
+                        <div class="text-sm text-gray-400">전체 수량 가능</div>
+                    </button>
+                </div>
+            </section>
+        </div>
+
+        <!-- 공구 목록 탭 -->
+        <div id="tab-tools" class="tab-content hidden">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-3xl font-bold">공구 목록</h2>
+                <button onclick="showCamera()"
+                    class="gradient-red px-6 py-3 rounded-lg font-bold hover:scale-105 transition">
+                    + 새 공구 등록
+                </button>
+            </div>
+
+            <!-- 검색 바 -->
+            <div class="mb-6">
+                <input type="text" id="search-input" placeholder="공구 이름, 브랜드, 모델로 검색..."
+                    class="w-full bg-dark-800 border border-dark-700 rounded-lg px-4 py-3 focus:outline-none focus:border-accent-red"
+                    onkeyup="searchTools()">
+            </div>
+
+            <!-- 공구 리스트 -->
+            <div id="tools-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="card-dark rounded-xl p-6 text-center text-gray-400">
+                    등록된 공구가 없습니다.<br>
+                    <button onclick="showCamera()" class="text-accent-red hover:underline mt-2">첫 공구 등록하기 →</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 설정 탭 -->
+        <div id="tab-settings" class="tab-content hidden">
+            <h2 class="text-3xl font-bold mb-6">설정</h2>
+            <div class="card-dark rounded-xl p-6">
+                <h3 class="text-xl font-bold mb-4">API 설정</h3>
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">백엔드 API URL</label>
+                        <input type="text" id="api-url" value="http://localhost:3000/api/v1"
+                            class="w-full bg-dark-900 border border-dark-700 rounded-lg px-4 py-2">
+                    </div>
+                    <button onclick="saveSettings()" class="gradient-red px-6 py-3 rounded-lg font-bold">
+                        저장
+                    </button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- 카메라 모달 -->
+    <div id="camera-modal" class="fixed inset-0 bg-black bg-opacity-90 hidden items-center justify-center z-50">
+        <div class="bg-dark-800 rounded-2xl p-8 max-w-2xl w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">공구 촬영 등록</h3>
+                <button onclick="closeCamera()" class="text-gray-400 hover:text-white text-2xl">×</button>
+            </div>
+
+            <div class="space-y-6">
+                <!-- 카메라 영역 -->
+                <div class="bg-dark-900 rounded-xl aspect-video relative overflow-hidden">
+                    <video id="camera-stream" class="w-full h-full object-cover" autoplay playsinline></video>
+                    <canvas id="camera-canvas" class="hidden"></canvas>
+                    <img id="captured-image" class="w-full h-full object-cover hidden" />
+
+                    <!-- 카메라 상태 메시지 -->
+                    <div id="camera-message" class="absolute inset-0 flex items-center justify-center text-center">
+                        <div class="text-gray-400">
+                            <div class="text-6xl mb-4">📷</div>
+                            <p>카메라를 시작하는 중...</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 촬영 버튼 (카메라 활성 시) -->
+                <div id="capture-controls" class="hidden">
+                    <button onclick="capturePhoto()"
+                        class="w-full gradient-red py-4 rounded-xl font-bold text-lg hover:scale-105 transition">
+                        📸 촬영하기
+                    </button>
+                </div>
+
+                <!-- 촬영 후 컨트롤 -->
+                <div id="captured-controls" class="hidden space-y-3">
+                    <div class="flex gap-3">
+                        <button onclick="retakePhoto()"
+                            class="flex-1 bg-dark-700 py-3 rounded-lg font-bold hover:bg-dark-600 transition">
+                            🔄 다시 촬영
+                        </button>
+                        <button onclick="approveAndAnalyze()"
+                            class="flex-1 gradient-red py-3 rounded-lg font-bold hover:scale-105 transition">
+                            ✅ AI 승인 (분석 시작)
+                        </button>
+                    </div>
+                    <div id="upload-status" class="text-center text-sm text-gray-400"></div>
+                </div>
+
+                <!-- URL 입력 + 파일 업로드 (폴백/대안) -->
+                <div id="url-fallback" class="hidden space-y-4">
+                    <div class="text-center text-sm text-gray-400 mb-3">
+                        카메라를 사용할 수 없나요? 아래 방법으로도 등록할 수 있습니다
+                    </div>
+
+                    <!-- 로컬 파일 업로드 -->
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">📁 로컬 파일 선택</label>
+                        <input type="file" id="file-upload-input" accept="image/*" class="hidden"
+                            onchange="handleFileUpload(this)">
+                        <button onclick="document.getElementById('file-upload-input').click()"
+                            class="w-full bg-dark-700 border border-dark-600 rounded-lg px-4 py-3 text-left hover:bg-dark-600 transition flex items-center justify-between">
+                            <span id="file-name-display" class="text-gray-400">파일 선택...</span>
+                            <span class="text-accent-red">📂 찾아보기</span>
+                        </button>
+                    </div>
+
+                    <!-- 구분선 -->
+                    <div class="flex items-center gap-3">
+                        <div class="flex-1 border-t border-dark-700"></div>
+                        <span class="text-sm text-gray-500">또는</span>
+                        <div class="flex-1 border-t border-dark-700"></div>
+                    </div>
+
+                    <!-- URL 입력 -->
+                    <div>
+                        <label class="block text-sm text-gray-400 mb-2">🔗 이미지 URL 입력</label>
+                        <input type="text" id="image-url-input" placeholder="https://example.com/tool-image.jpg"
+                            class="w-full bg-dark-900 border border-dark-700 rounded-lg px-4 py-3">
+                    </div>
+
+                    <button onclick="analyzeFromUrlOrFile()"
+                        class="w-full gradient-red py-4 rounded-xl font-bold text-lg hover:scale-105 transition">
+                        AI 분석 시작
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- AI 분석 결과 모달 -->
+    <div id="result-modal" class="fixed inset-0 bg-black bg-opacity-90 hidden items-center justify-center z-50">
+        <div class="bg-dark-800 rounded-2xl p-8 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">AI 분석 결과</h3>
+                <button onclick="closeResult()" class="text-gray-400 hover:text-white text-2xl">×</button>
+            </div>
+
+            <div id="analysis-results" class="space-y-4">
+                <!-- 결과가 여기에 표시됩니다 -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // API Base URL - 현재 도메인 기준
+        const API_URL = window.location.origin.includes('localhost')
+            ? 'http://localhost:3000/api/v1'
+            : 'https://uconai.ddns.net/api/v1';
+
+        // AI 서버 URL (임시: 직접 호출)
+        const AI_URL = window.location.origin.includes('localhost')
+            ? 'http://localhost:8000'
+            : 'https://uconai.ddns.net:8000';
+
+        let authToken = null;
+
+        // 탭 전환
+        function showTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+
+            // 버튼 활성화 상태
+            document.querySelectorAll('nav button').forEach(btn => {
+                btn.classList.remove('gradient-red');
+                btn.classList.add('bg-dark-800');
+            });
+            document.getElementById(`btn-${tabName}`).classList.remove('bg-dark-800');
+            document.getElementById(`btn-${tabName}`).classList.add('gradient-red');
+
+            // 공구 목록 탭이면 데이터 로드
+            if (tabName === 'tools') {
+                loadTools();
+            } else if (tabName === 'dashboard') {
+                loadStats();
+            }
+        }
+
+        // 카메라 관련 변수
+        let cameraStream = null;
+        let capturedImageData = null;
+        let uploadedImageUrl = null;
+
+        // 카메라 모달
+        async function showCamera() {
+            document.getElementById('camera-modal').classList.remove('hidden');
+            document.getElementById('camera-modal').classList.add('flex');
+
+            // 카메라 시작
+            await startCamera();
+        }
+
+        function closeCamera() {
+            // 카메라 스트림 중지
+            if (cameraStream) {
+                cameraStream.getTracks().forEach(track => track.stop());
+                cameraStream = null;
+            }
+
+            document.getElementById('camera-modal').classList.add('hidden');
+            document.getElementById('camera-modal').classList.remove('flex');
+
+            // 리셋
+            resetCameraModal();
+        }
+
+        function resetCameraModal() {
+            document.getElementById('camera-stream').classList.remove('hidden');
+            document.getElementById('captured-image').classList.add('hidden');
+            document.getElementById('capture-controls').classList.add('hidden');
+            document.getElementById('captured-controls').classList.add('hidden');
+            document.getElementById('url-fallback').classList.add('hidden');
+            document.getElementById('camera-message').classList.remove('hidden');
+            capturedImageData = null;
+            uploadedImageUrl = null;
+        }
+
+        // 카메라 시작
+        async function startCamera() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: {
+                        facingMode: 'environment',  // 후면 카메라 우선
+                        width: { ideal: 1920 },
+                        height: { ideal: 1080 }
+                    }
+                });
+
+                cameraStream = stream;
+                const video = document.getElementById('camera-stream');
+                video.srcObject = stream;
+
+                // UI 업데이트
+                document.getElementById('camera-message').classList.add('hidden');
+                document.getElementById('capture-controls').classList.remove('hidden');
+
+            } catch (error) {
+                console.error('카메라 접근 실패:', error);
+
+                // 폴백: URL 입력
+                document.getElementById('camera-message').innerHTML = `
+                    <div class="text-gray-400">
+                        <div class="text-6xl mb-4">⚠️</div>
+                        <p>카메라 접근 실패</p>
+                        <p class="text-sm mt-2">${error.message}</p>
+                        <p class="text-sm mt-2">아래에서 이미지 URL을 입력해주세요</p>
+                    </div>
+                `;
+                document.getElementById('url-fallback').classList.remove('hidden');
+            }
+        }
+
+        // 사진 촬영
+        function capturePhoto() {
+            const video = document.getElementById('camera-stream');
+            const canvas = document.getElementById('camera-canvas');
+            const capturedImage = document.getElementById('captured-image');
+
+            // 캔버스 크기를 비디오 크기와 맞춤
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+
+            // 비디오 프레임을 캔버스에 그리기
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // 이미지 데이터 저장
+            capturedImageData = canvas.toDataURL('image/jpeg', 0.9);
+
+            // 캡처된 이미지 표시
+            capturedImage.src = capturedImageData;
+            video.classList.add('hidden');
+            capturedImage.classList.remove('hidden');
+
+            // UI 전환
+            document.getElementById('capture-controls').classList.add('hidden');
+            document.getElementById('captured-controls').classList.remove('hidden');
+
+            // 즉시 서버에 업로드 (DB 저장)
+            uploadPhotoToDB();
+        }
+
+        // 다시 촬영
+        function retakePhoto() {
+            document.getElementById('camera-stream').classList.remove('hidden');
+            document.getElementById('captured-image').classList.add('hidden');
+            document.getElementById('capture-controls').classList.remove('hidden');
+            document.getElementById('captured-controls').classList.add('hidden');
+            document.getElementById('upload-status').textContent = '';
+            capturedImageData = null;
+            uploadedImageUrl = null;
+        }
+
+        // 촬영 즉시 DB 저장
+        async function uploadPhotoToDB() {
+            const statusEl = document.getElementById('upload-status');
+            statusEl.textContent = '📤 이미지 업로드 중...';
+
+            try {
+                // Base64를 Blob으로 변환
+                const blob = dataURLtoBlob(capturedImageData);
+                const formData = new FormData();
+                formData.append('file', blob, 'captured-tool.jpg');
+
+                // 서버 업로드 API 호출
+                const response = await fetch(`${API_URL}/upload`, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${authToken || 'demo-token'}`
+                    },
+                    body: formData
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    uploadedImageUrl = data.url || data.imageUrl;
+                    statusEl.innerHTML = '✅ 저장 완료! <span class="text-green-400">AI 승인 버튼을 눌러주세요</span>';
+                } else {
+                    // 업로드 실패 시 임시 URL 사용
+                    uploadedImageUrl = capturedImageData;
+                    statusEl.textContent = '⚠️ 업로드 실패 (로컬 이미지 사용)';
+                }
+            } catch (error) {
+                console.error('업로드 오류:', error);
+                uploadedImageUrl = capturedImageData;
+                statusEl.textContent = '⚠️ 업로드 오류 (로컬 이미지 사용)';
+            }
+        }
+
+        // AI 승인 및 분석 시작
+        async function approveAndAnalyze() {
+            if (!uploadedImageUrl) {
+                alert('이미지가 준비되지 않았습니다');
+                return;
+            }
+
+            const statusEl = document.getElementById('upload-status');
+            statusEl.textContent = '🤖 AI 분석 중...';
+
+            try {
+                const response = await fetch(`${API_URL}/analyze/image`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken || 'demo-token'}`
+                    },
+                    body: JSON.stringify({ imageUrl: uploadedImageUrl })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.candidates) {
+                    showAnalysisResults(data.candidates);
+                    closeCamera();
+                } else {
+                    alert('분석 실패: ' + (data.error || '알 수 없는 오류'));
+                }
+            } catch (error) {
+                console.error('분석 오류:', error);
+                alert('분석 중 오류가 발생했습니다');
+            }
+        }
+
+        // 파일 업로드 핸들러
+        let selectedFileData = null;
+
+        function handleFileUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            // 파일명 표시
+            document.getElementById('file-name-display').textContent = file.name;
+
+            // 파일을 Base64로 읽기
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                selectedFileData = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // URL 또는 파일로 분석
+        async function analyzeFromUrlOrFile() {
+            let imageUrl = null;
+
+            // 1. 선택된 파일이 있는지 확인
+            if (selectedFileData) {
+                imageUrl = selectedFileData;
+            }
+            // 2. URL 입력이 있는지 확인
+            else {
+                imageUrl = document.getElementById('image-url-input').value;
+            }
+
+            if (!imageUrl) {
+                alert('이미지 파일을 선택하거나 URL을 입력해주세요');
+                return;
+            }
+
+            try {
+                // Base64 이미지인 경우 먼저 서버에 업로드
+                if (imageUrl.startsWith('data:image')) {
+                    const blob = dataURLtoBlob(imageUrl);
+                    const formData = new FormData();
+                    formData.append('file', blob, 'uploaded-tool.jpg');
+
+                    const uploadResponse = await fetch(`${API_URL}/upload`, {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${authToken || 'demo-token'}`
+                        },
+                        body: formData
+                    });
+
+                    if (uploadResponse.ok) {
+                        const uploadData = await uploadResponse.json();
+                        imageUrl = uploadData.url || uploadData.imageUrl;
+                    }
+                }
+
+                // AI 분석 시작
+                const response = await fetch(`${API_URL}/analyze/image`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken || 'demo-token'}`
+                    },
+                    body: JSON.stringify({ imageUrl })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.candidates) {
+                    showAnalysisResults(data.candidates);
+                    closeCamera();
+                } else {
+                    alert('분석 실패: ' + (data.error || '알 수 없는 오류'));
+                }
+            } catch (error) {
+                console.error('분석 오류:', error);
+                alert('분석 중 오류가 발생했습니다');
+            }
+        }
+
+        // URL로 분석 (폴백 - 호환성 유지)
+        async function analyzeFromUrl() {
+            const imageUrl = document.getElementById('image-url-input').value;
+            if (!imageUrl) {
+                alert('이미지 URL을 입력해주세요');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/analyze/image`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken || 'demo-token'}`
+                    },
+                    body: JSON.stringify({ imageUrl })
+                });
+
+                const data = await response.json();
+
+                if (data.success && data.candidates) {
+                    showAnalysisResults(data.candidates);
+                    closeCamera();
+                } else {
+                    alert('분석 실패: ' + (data.error || '알 수 없는 오류'));
+                }
+            } catch (error) {
+                console.error('분석 오류:', error);
+                alert('분석 중 오류가 발생했습니다');
+            }
+        }
+
+        // Base64를 Blob으로 변환
+        function dataURLtoBlob(dataURL) {
+            const arr = dataURL.split(',');
+            const mime = arr[0].match(/:(.*?);/)[1];
+            const bstr = atob(arr[1]);
+            let n = bstr.length;
+            const u8arr = new Uint8Array(n);
+            while (n--) {
+                u8arr[n] = bstr.charCodeAt(n);
+            }
+            return new Blob([u8arr], { type: mime });
+        }
+
+        function closeResult() {
+            document.getElementById('result-modal').classList.add('hidden');
+            document.getElementById('result-modal').classList.remove('flex');
+        }
+
+        // 분석 결과 표시
+        function showAnalysisResults(candidates) {
+            const container = document.getElementById('analysis-results');
+            container.innerHTML = candidates.map((tool, idx) => `
+                <div class="card-dark rounded-xl p-6">
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <h4 class="text-xl font-bold">${idx + 1}. ${tool.name}</h4>
+                            <p class="text-sm text-gray-400">${tool.brand} ${tool.model}</p>
+                        </div>
+                        <div class="text-right">
+                            <div class="text-2xl font-bold text-accent-red">${(tool.confidence * 100).toFixed(0)}%</div>
+                            <div class="text-xs text-gray-400">신뢰도</div>
+                        </div>
+                    </div>
+                    <div class="text-sm text-gray-400 mb-4">
+                        ${tool.category} • ${tool.type}<br>
+                        ${tool.description || ''}
+                        ${tool.price ? `<br>예상 가격: ${tool.price.toLocaleString()}원` : ''}
+                    </div>
+                    <button onclick="registerTool(${idx})" class="w-full gradient-red py-3 rounded-lg font-bold hover:scale-105 transition">
+                        이 공구로 등록하기
+                    </button>
+                </div>
+            `).join('');
+
+            // 전역 변수에 저장
+            window.analysisData = candidates;
+
+            document.getElementById('result-modal').classList.remove('hidden');
+            document.getElementById('result-modal').classList.add('flex');
+        }
+
+        // 공구 등록
+        async function registerTool(index) {
+            const tool = window.analysisData[index];
+
+            try {
+                const response = await fetch(`${API_URL}/tools`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken || 'demo-token'}`
+                    },
+                    body: JSON.stringify({
+                        name: tool.name,
+                        brand: tool.brand,
+                        model: tool.model,
+                        category: tool.category,
+                        type: tool.type,
+                        status: 'available',
+                        condition: 'excellent'
+                    })
+                });
+
+                if (response.ok) {
+                    alert('✅ 공구가 등록되었습니다!');
+                    closeResult();
+                    loadStats();
+                    showTab('tools');
+                } else {
+                    alert('등록 실패');
+                }
+            } catch (error) {
+                console.error('등록 오류:', error);
+                alert('등록 중 오류가 발생했습니다');
+            }
+        }
+
+        // 통계 로드
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_URL}/stats/dashboard`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken || 'demo-token'}`
+                    }
+                });
+                const data = await response.json();
+
+                document.getElementById('stat-total').textContent = data.summary.totalTools;
+                document.getElementById('stat-rented').textContent = data.summary.rented;
+                document.getElementById('stat-available').textContent = data.summary.available;
+                document.getElementById('stat-lost').textContent = data.summary.lost;
+            } catch (error) {
+                console.error('통계 로드 실패:', error);
+            }
+        }
+
+        // 공구 목록 로드
+        async function loadTools() {
+            try {
+                const response = await fetch(`${API_URL}/tools`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken || 'demo-token'}`
+                    }
+                });
+                const data = await response.json();
+
+                const container = document.getElementById('tools-list');
+                if (data.tools && data.tools.length > 0) {
+                    container.innerHTML = data.tools.map(tool => `
+                        <div class="card-dark rounded-xl p-6 hover:scale-105 transition">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h4 class="text-lg font-bold">${tool.name}</h4>
+                                    <p class="text-sm text-gray-400">${tool.brand || ''} ${tool.model || ''}</p>
+                                </div>
+                                <span class="px-3 py-1 rounded-full text-xs ${tool.status === 'available' ? 'bg-green-500/20 text-green-400' :
+                            tool.status === 'rented' ? 'bg-yellow-500/20 text-yellow-400' :
+                                'bg-red-500/20 text-red-400'
+                        }">
+                                    ${tool.status === 'available' ? '사용가능' : tool.status === 'rented' ? '대여중' : '망실'}
+                                </span>
+                            </div>
+                            <div class="text-sm text-gray-400">
+                                ${tool.category || ''} • ${tool.type || ''}<br>
+                                상태: ${tool.condition || 'unknown'}
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    container.innerHTML = `
+                        <div class="card-dark rounded-xl p-6 text-center text-gray-400">
+                            등록된 공구가 없습니다.<br>
+                            <button onclick="showCamera()" class="text-accent-red hover:underline mt-2">첫 공구 등록하기 →</button>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('공구 목록 로드 실패:', error);
+            }
+        }
+
+        // 검색
+        function searchTools() {
+            const query = document.getElementById('search-input').value;
+            // TODO: 검색 구현
+        }
+
+        // 설정 저장
+        function saveSettings() {
+            API_URL = document.getElementById('api-url').value;
+            localStorage.setItem('apiUrl', API_URL);
+            alert('설정이 저장되었습니다');
+        }
+
+        // 초기화
+        document.addEventListener('DOMContentLoaded', () => {
+            // 저장된 API URL 로드
+            const savedUrl = localStorage.getItem('apiUrl');
+            if (savedUrl) {
+                API_URL = savedUrl;
+                document.getElementById('api-url').value = savedUrl;
+            }
+
+            // 임시 토큰 (실제로는 로그인 후 받아야 함)
+            // 데모용으로 자동 회원가입/로그인
+            autoLogin();
+        });
+
+        // 자동 로그인 (데모용)
+        async function autoLogin() {
+            try {
+                // 회원가입 시도
+                const registerRes = await fetch(`${API_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        email: 'demo@gonggubanjang.com',
+                        password: 'demo1234',
+                        name: '데모 사용자'
+                    })
+                });
+
+                if (registerRes.ok) {
+                    const data = await registerRes.json();
+                    authToken = data.token;
+                } else {
+                    // 이미 존재하면 로그인
+                    const loginRes = await fetch(`${API_URL}/auth/login`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            email: 'demo@gonggubanjang.com',
+                            password: 'demo1234'
+                        })
+                    });
+
+                    if (loginRes.ok) {
+                        const data = await loginRes.json();
+                        authToken = data.token;
+                    }
+                }
+
+                // 통계 로드
+                loadStats();
+            } catch (error) {
+                console.error('자동 로그인 실패:', error);
+            }
+        }
+    </script>
+</body>
+
+</html>
